@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Scripture of Harmonism — Canonical Codex</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cinzel for liturgical headings, Crimson Pro for classic body serif -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Theme Design Tokens */
+    :root {
+      --bg-page: #F7F3EA;
+      --bg-surface: #EFE9DC;
+      --bg-elevated: #FAF7F0;
+      --ink-primary: #1F1B18;
+      --ink-secondary: #574E46;
+      --ink-muted: #8A7F73;
+      --accent-gold: #8C6D3F;
+      --accent-gold-soft: rgba(140, 109, 63, 0.12);
+      --border-hairline: #DCD4C4;
+      --highlight-bg: rgba(140, 109, 63, 0.16);
+      --shadow-codex: 0 20px 50px -15px rgba(31, 27, 24, 0.08);
+    }
+
+    html.dark {
+      --bg-page: #161412;
+      --bg-surface: #1E1B18;
+      --bg-elevated: #23201C;
+      --ink-primary: #E8E2D5;
+      --ink-secondary: #B5ACA0;
+      --ink-muted: #787066;
+      --accent-gold: #C29F63;
+      --accent-gold-soft: rgba(194, 159, 99, 0.14);
+      --border-hairline: #2E2924;
+      --highlight-bg: rgba(194, 159, 99, 0.18);
+      --shadow-codex: 0 25px 60px -15px rgba(0, 0, 0, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-page);
+      color: var(--ink-primary);
+    }
+
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      background-color: var(--bg-page);
+      color: var(--ink-primary);
+      transition: background-color 0.35s ease, color 0.35s ease;
+      overflow-x: hidden;
+      /* Subtle tactile paper grain overlay */
+      background-image: radial-gradient(rgba(140, 109, 63, 0.04) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    .font-display {
+      font-family: 'Cinzel', Georgia, serif;
+    }
+
+    .font-scripture {
+      font-family: 'Crimson Pro', Georgia, serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-page);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-hairline);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-gold);
+    }
+
+    /* Illuminated Drop Cap on the first verse of each chapter */
+    .drop-cap-verse .verse-text::first-letter {
+      font-family: 'Cinzel', Georgia, serif;
+      float: left;
+      font-size: 3.35em;
+      line-height: 0.82;
+      padding-top: 0.06em;
+      padding-right: 0.16em;
+      padding-bottom: 0.04em;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    /* Two-column Open Codex layout on wide screens */
+    @media (min-width: 1024px) {
+      .codex-two-col {
+        column-count: 2;
+        column-gap: 3.25rem;
+        column-rule: 1px solid var(--border-hairline);
+      }
+      .codex-two-col .chapter-block {
+        break-inside: auto;
+      }
+      .codex-two-col .chapter-header {
+        break-after: avoid;
+      }
+      .codex-two-col .verse-item {
+        break-inside: avoid;
+      }
+    }
+
+    /* Verse interaction & highlighting */
+    .verse-item {
+      position: relative;
+      padding: 0.32rem 0.65rem 0.32rem 2.1rem;
+      margin-left: -0.65rem;
+      margin-right: -0.65rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.2s ease, transform 0.15s ease;
+      cursor: pointer;
+    }
+
+    .verse-item:hover {
+      background-color: var(--accent-gold-soft);
+    }
+
+    .verse-item.is-highlighted {
+      background-color: var(--highlight-bg);
+      box-shadow: inset 2px 0 0 var(--accent-gold);
+    }
+
+    /* Search Jump Golden Pulse & Keyword Highlight */
+    @keyframes searchPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(140, 109, 63, 0.55), inset 3px 0 0 var(--accent-gold);
+        background-color: rgba(140, 109, 63, 0.28);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(140, 109, 63, 0), inset 3px 0 0 var(--accent-gold);
+        background-color: rgba(140, 109, 63, 0.2);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(140, 109, 63, 0), inset 2px 0 0 var(--accent-gold);
+      }
+    }
+
+    .verse-item.search-jump-glow {
+      animation: searchPulse 2.2s ease-out forwards;
+      background-color: var(--highlight-bg);
+      box-shadow: inset 2px 0 0 var(--accent-gold);
+    }
+
+    mark.concordance-mark {
+      background-color: rgba(194, 159, 99, 0.34);
+      color: inherit;
+      padding: 0.04em 0.2em;
+      border-radius: 0.25rem;
+      box-shadow: 0 0 0 1px rgba(140, 109, 63, 0.35);
+      font-weight: 500;
+    }
+
+    .verse-num {
+      position: absolute;
+      left: 0.45rem;
+      top: 0.48rem;
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+      user-select: none;
+      letter-spacing: 0.02em;
+    }
+
+    .verse-item.is-highlighted .verse-num {
+      color: var(--accent-gold);
+    }
+
+    /* Font Scale Classes */
+    .text-scale-sm .verse-text {
+      font-size: 1.0625rem;
+      line-height: 1.72;
+    }
+    .text-scale-md .verse-text {
+      font-size: 1.225rem;
+      line-height: 1.78;
+    }
+    .text-scale-lg .verse-text {
+      font-size: 1.4rem;
+      line-height: 1.82;
+    }
+
+    /* Ornamental Divider */
+    .ornament-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+      color: var(--accent-gold);
+    }
+    .ornament-rule::before,
+    .ornament-rule::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      max-width: 7rem;
+      background: linear-gradient(to right, transparent, var(--border-hairline), var(--accent-gold));
+    }
+    .ornament-rule::after {
+      background: linear-gradient(to left, transparent, var(--border-hairline), var(--accent-gold));
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-[#8C6D3F]/20">
+
+  <!-- Reading Progress Bar -->
+  <div class="fixed top-0 left-0 right-0 h-[2.5px] z-50 bg-transparent pointer-events-none">
+    <div id="progressBar" class="h-full w-0 transition-all duration-150" style="background-color: var(--accent-gold);"></div>
+  </div>
+
+  <!-- Top Liturgical Header & Controls -->
+  <header class="sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-300"
+          style="background-color: color-mix(in srgb, var(--bg-page) 88%, transparent); border-color: var(--border-hairline);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      
+      <!-- Left: TOC Toggle (Scripture View) + Codex Title -->
+      <div class="flex items-center gap-3 min-w-0">
+        <button id="tocToggleBtn"
+                aria-label="Toggle Table of Contents"
+                class="hidden p-2.5 rounded-lg border transition-colors flex items-center gap-2 text-sm font-display tracking-wider hover:opacity-80"
+                style="border-color: var(--border-hairline); background-color: var(--bg-elevated); color: var(--ink-primary);">
+          <svg class="w-4 h-4" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h12M4 18h16" />
+          </svg>
+          <span class="hidden sm:inline text-xs font-semibold">INDEX</span>
+        </button>
+
+        <button id="brandHomeBtn" type="button" class="text-left truncate group focus:outline-none">
+          <div class="font-display text-sm sm:text-base md:text-lg font-semibold tracking-[0.14em] uppercase truncate"
+               style="color: var(--ink-primary);">
+            The Scripture of Harmonism
+          </div>
+          <div id="currentChapterIndicator" class="text-xs italic truncate hidden md:block" style="color: var(--ink-muted);">
+            The Codex of Resonance
+          </div>
+        </button>
+      </div>
+
+      <!-- Right: View Switcher + Reading Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+
+        <!-- Persistent Home / Scripture View Toggle -->
+        <div class="flex items-center rounded-lg border p-0.5"
+             style="border-color: var(--border-hairline); background-color: var(--bg-elevated);"
+             role="tablist" aria-label="Codex View">
+          <button id="navHomeBtn"
+                  role="tab"
+                  aria-selected="true"
+                  class="px-2.5 sm:px-3 py-1.5 rounded-md font-display text-xs font-semibold tracking-wider uppercase transition-colors">
+            Home
+          </button>
+          <button id="navScriptureBtn"
+                  role="tab"
+                  aria-selected="false"
+                  class="px-2.5 sm:px-3 py-1.5 rounded-md font-display text-xs font-semibold tracking-wider uppercase transition-colors">
+            Scripture
+          </button>
+        </div>
+        
+        <!-- Concordance Search Trigger Button -->
+        <button id="openSearchBtn"
+                aria-label="Search Scripture Concordance"
+                title="Search Scripture (Ctrl+K or /)"
+                class="px-2.5 sm:px-3 py-2 rounded-lg border flex items-center gap-2 text-xs font-display tracking-wider transition-colors hover:opacity-85"
+                style="border-color: var(--border-hairline); background-color: var(--bg-elevated); color: var(--ink-primary);">
+          <svg class="w-4 h-4 shrink-0" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7" />
+            <path stroke-linecap="round" d="M20 20l-3.5-3.5" />
+          </svg>
+          <span class="hidden md:inline">CONCORDANCE</span>
+          <kbd class="hidden xl:inline-block px-1.5 py-0.5 text-[0.65rem] rounded border font-sans"
+               style="border-color: var(--border-hairline); color: var(--ink-muted);">Ctrl K</kbd>
+        </button>
+
+        <!-- Active Search Filter Pill (Shown when keywords are highlighted in text) -->
+        <button id="clearSearchHighlightsHeaderBtn"
+                title="Clear highlighted search terms"
+                class="hidden px-2.5 py-2 rounded-lg border flex items-center gap-1.5 text-xs font-display tracking-wider transition-colors hover:opacity-85"
+                style="border-color: var(--accent-gold); background-color: var(--accent-gold-soft); color: var(--accent-gold);">
+          <span id="activeQueryBadge" class="max-w-[7rem] truncate normal-case font-scripture italic text-sm"></span>
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Font Size Controls (Shown in Scripture View) -->
+        <div id="fontSizeGroup"
+             class="hidden items-center rounded-lg border p-0.5"
+             style="border-color: var(--border-hairline); background-color: var(--bg-elevated);"
+             role="group" aria-label="Font size">
+          <button data-size="sm" class="font-size-btn px-2 py-1.5 rounded-md font-display text-xs transition-colors" title="Small text">A-</button>
+          <button data-size="md" class="font-size-btn px-2.5 py-1.5 rounded-md font-display text-sm font-semibold transition-colors" title="Medium text">A</button>
+          <button data-size="lg" class="font-size-btn px-2 py-1.5 rounded-md font-display text-base transition-colors" title="Large text">A+</button>
+        </div>
+
+        <!-- Column Layout Toggle (Desktop Only, Shown in Scripture View) -->
+        <button id="layoutToggleBtn"
+                title="Toggle Single Column / Two-Column Open Codex"
+                class="hidden items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-display tracking-wider transition-colors"
+                style="border-color: var(--border-hairline); background-color: var(--bg-elevated); color: var(--ink-primary);">
+          <svg id="layoutIconSingle" class="w-4 h-4" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+            <rect x="5" y="4" width="14" height="16" rx="2" />
+            <path d="M8 8h8M8 12h8M8 16h5" />
+          </svg>
+          <svg id="layoutIconDual" class="w-4 h-4 hidden" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M12 4v16M6 8h3M6 12h3M6 16h3M15 8h3M15 12h3M15 16h3" />
+          </svg>
+          <span id="layoutLabel">CODEX</span>
+        </button>
+
+        <!-- Candlelight / Night Mode Toggle -->
+        <button id="themeToggleBtn"
+                aria-label="Toggle Candlelight Mode"
+                title="Toggle Parchment / Candlelight Mode"
+                class="p-2.5 sm:px-3 sm:py-2 rounded-lg border flex items-center gap-1.5 text-xs font-display tracking-wider transition-colors"
+                style="border-color: var(--border-hairline); background-color: var(--bg-elevated); color: var(--ink-primary);">
+          <!-- Moon / Candle Icon for Day Mode -->
+          <svg id="iconMoon" class="w-4 h-4" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+          <!-- Sun / Parchment Icon for Night Mode -->
+          <svg id="iconSun" class="w-4 h-4 hidden" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4" />
+            <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
+          </svg>
+          <span id="themeLabel" class="hidden sm:inline">CANDLELIGHT</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       VIEW 1: DEDICATED LITERARY HOME PAGE (INITIAL VIEW)
+       ========================================================= -->
+  <section id="homeView" class="max-w-5xl mx-auto px-4 sm:px-8 md:px-12 py-10 sm:py-16">
+    <div class="rounded-2xl border px-6 sm:px-12 md:px-16 py-12 sm:py-16 transition-all duration-300"
+         style="background-color: var(--bg-elevated); border-color: var(--border-hairline); box-shadow: var(--shadow-codex);">
+
+      <!-- 1. Hero / The Threshold -->
+      <div class="text-center pb-12 sm:pb-16 border-b" style="border-color: var(--border-hairline);">
+        <div class="font-display text-xs tracking-[0.32em] uppercase mb-3" style="color: var(--accent-gold);">
+          The Codex of Resonance
+        </div>
+
+        <h1 class="font-display text-3xl sm:text-5xl md:text-[3.1rem] font-semibold tracking-[0.12em] uppercase leading-tight mb-6"
+            style="color: var(--ink-primary);">
+          The Scripture of Harmonism
+        </h1>
+
+        <div class="ornament-rule mb-7">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+            <circle cx="12" cy="12" r="8" />
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
+          </svg>
+        </div>
+
+        <blockquote class="max-w-2xl mx-auto font-scripture italic text-xl sm:text-2xl leading-relaxed mb-9"
+                    style="color: var(--ink-primary);">
+          “To kin as kin, xe asks of love and compassion. To believe or to not is thy choice to begin with.”
+        </blockquote>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4">
+          <button id="heroOpenScriptureBtn"
+                  type="button"
+                  class="w-full sm:w-auto px-7 py-3.5 rounded-xl font-display text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase transition-all hover:opacity-90 shadow-sm"
+                  style="background-color: var(--accent-gold); color: var(--bg-page);">
+            Open the Scripture
+          </button>
+
+          <button id="heroSearchConcordanceBtn"
+                  type="button"
+                  class="w-full sm:w-auto px-7 py-3.5 rounded-xl border font-display text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase transition-colors hover:opacity-85 flex items-center justify-center gap-2"
+                  style="border-color: var(--border-hairline); background-color: var(--bg-surface); color: var(--ink-primary);">
+            <svg class="w-4 h-4" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7" />
+              <path stroke-linecap="round" d="M20 20l-3.5-3.5" />
+            </svg>
+            <span>Search Concordance</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Core Theology Comparison Table: The Three Pillars & The Three Fractures -->
+      <div class="py-12 sm:py-16 border-b" style="border-color: var(--border-hairline);">
+        <div class="text-center mb-8 sm:mb-10">
+          <div class="font-display text-[0.7rem] tracking-[0.28em] uppercase mb-2" style="color: var(--accent-gold);">
+            The Symmetry of Resonance
+          </div>
+          <h2 class="font-display text-xl sm:text-2xl font-semibold tracking-[0.12em] uppercase" style="color: var(--ink-primary);">
+            The Three Pillars &amp; The Three Fractures
+          </h2>
+        </div>
+
+        <div class="rounded-xl border overflow-hidden" style="border-color: var(--border-hairline);">
+          <!-- Table Header -->
+          <div class="grid grid-cols-1 md:grid-cols-2 border-b text-center md:text-left"
+               style="background-color: var(--bg-surface); border-color: var(--border-hairline);">
+            <div class="px-5 sm:px-7 py-3.5 md:border-r font-display text-xs font-semibold tracking-[0.2em] uppercase flex items-center justify-center md:justify-start gap-2"
+                 style="border-color: var(--border-hairline); color: var(--accent-gold);">
+              <span>✦</span>
+              <span>The Three Pillars</span>
+            </div>
+            <div class="px-5 sm:px-7 py-3.5 font-display text-xs font-semibold tracking-[0.2em] uppercase flex items-center justify-center md:justify-start gap-2 border-t md:border-t-0"
+                 style="border-color: var(--border-hairline); color: var(--ink-muted);">
+              <span>✧</span>
+              <span>The Three Fractures</span>
+            </div>
+          </div>
+
+          <!-- Row 1: Unity <-> Severance -->
+          <div class="grid grid-cols-1 md:grid-cols-2 border-b" style="border-color: var(--border-hairline);">
+            <div class="p-5 sm:p-7 md:border-r" style="border-color: var(--border-hairline);">
+              <div class="font-display text-base sm:text-lg font-semibold tracking-[0.08em] uppercase mb-1.5"
+                   style="color: var(--ink-primary);">
+                Unity
+              </div>
+              <p class="font-scripture text-base sm:text-[1.08rem] leading-relaxed" style="color: var(--ink-secondary);">
+                Resonance of fullness choosing fullness — standing beside kin and nature at a shared table without hierarchy or lack.
+              </p>
+            </div>
+            <div class="p-5 sm:p-7 border-t md:border-t-0" style="border-color: var(--border-hairline); background-color: color-mix(in srgb, var(--bg-surface) 45%, transparent);">
+              <div class="font-display text-base sm:text-lg font-semibold tracking-[0.08em] uppercase mb-1.5"
+                   style="color: var(--ink-secondary);">
+                Severance
+              </div>
+              <p class="font-scripture text-base sm:text-[1.08rem] leading-relaxed" style="color: var(--ink-muted);">
+                The primordial cutting of oneself from the shared table — marking a line between kin and stranger until walls and swords follow.
+              </p>
+            </div>
+          </div>
+
+          <!-- Row 2: Liberty <-> Coercion -->
+          <div class="grid grid-cols-1 md:grid-cols-2 border-b" style="border-color: var(--border-hairline);">
+            <div class="p-5 sm:p-7 md:border-r" style="border-color: var(--border-hairline);">
+              <div class="font-display text-base sm:text-lg font-semibold tracking-[0.08em] uppercase mb-1.5"
+                   style="color: var(--ink-primary);">
+                Liberty
+              </div>
+              <p class="font-scripture text-base sm:text-[1.08rem] leading-relaxed" style="color: var(--ink-secondary);">
+                Voluntary closeness and sacred boundaries — entering only where the door is opened, and honoring the unbent nature of every soul.
+              </p>
+            </div>
+            <div class="p-5 sm:p-7 border-t md:border-t-0" style="border-color: var(--border-hairline); background-color: color-mix(in srgb, var(--bg-surface) 45%, transparent);">
+              <div class="font-display text-base sm:text-lg font-semibold tracking-[0.08em] uppercase mb-1.5"
+                   style="color: var(--ink-secondary);">
+                Coercion
+              </div>
+              <p class="font-scripture text-base sm:text-[1.08rem] leading-relaxed" style="color: var(--ink-muted);">
+                Trespassing upon another’s dwelling, will, or nature — forcing a whole soul to bend through law, shame, or contrived scarcity.
+              </p>
+            </div>
+          </div>
+
+          <!-- Row 3: Clarity <-> Dishonesty -->
+          <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="p-5 sm:p-7 md:border-r" style="border-color: var(--border-hairline);">
+              <div class="font-display text-base sm:text-lg font-semibold tracking-[0.08em] uppercase mb-1.5"
+                   style="color: var(--ink-primary);">
+                Clarity
+              </div>
+              <p class="font-scripture text-base sm:text-[1.08rem] leading-relaxed" style="color: var(--ink-secondary);">
+                Transparent truth and courageous doubt — looking plainly at every boundary to ask who drew it, why, and whether it is true.
+              </p>
+            </div>
+            <div class="p-5 sm:p-7 border-t md:border-t-0" style="border-color: var(--border-hairline); background-color: color-mix(in srgb, var(--bg-surface) 45%, transparent);">
+              <div class="font-display text-base sm:text-lg font-semibold tracking-[0.08em] uppercase mb-1.5"
+                   style="color: var(--ink-secondary);">
+                Dishonesty
+              </div>
+              <p class="font-scripture text-base sm:text-[1.08rem] leading-relaxed" style="color: var(--ink-muted);">
+                Distortion, slander, and false piety — wearing a mask of lies before the Maker or blackening a neighbor’s name with words forged of breath.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. The Argument of the Three Books (Interactive Navigation Cards) -->
+      <div class="py-12 sm:py-16 border-b" style="border-color: var(--border-hairline);">
+        <div class="text-center mb-8 sm:mb-10">
+          <div class="font-display text-[0.7rem] tracking-[0.28em] uppercase mb-2" style="color: var(--accent-gold);">
+            The Argument of the Three Books
+          </div>
+          <h2 class="font-display text-xl sm:text-2xl font-semibold tracking-[0.12em] uppercase" style="color: var(--ink-primary);">
+            Contents of the Codex
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Book I Card -->
+          <article class="rounded-xl border p-6 sm:p-7 flex flex-col justify-between transition-all hover:-translate-y-0.5"
+                   style="background-color: var(--bg-surface); border-color: var(--border-hairline);">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="font-display text-xs font-semibold tracking-[0.22em] uppercase" style="color: var(--accent-gold);">
+                  Book I
+                </span>
+                <span class="font-display text-[0.68rem] tracking-wider uppercase" style="color: var(--ink-muted);">
+                  7 Chapters
+                </span>
+              </div>
+              <h3 class="font-display text-xl sm:text-2xl font-semibold tracking-[0.08em] uppercase mb-3"
+                  style="color: var(--ink-primary);">
+                Genesis
+              </h3>
+              <p class="font-scripture italic text-base sm:text-[1.08rem] leading-relaxed mb-5"
+                 style="color: var(--ink-primary);">
+                “On how all things came to be, and how all things learned to love.”
+              </p>
+
+              <div class="pt-4 border-t mb-6" style="border-color: var(--border-hairline);">
+                <div class="font-display text-[0.65rem] tracking-[0.2em] uppercase mb-2" style="color: var(--ink-muted);">
+                  Chapters Included
+                </div>
+                <ul class="space-y-1 text-sm font-scripture" style="color: var(--ink-secondary);">
+                  <li>I. On the First Silence</li>
+                  <li>II. On the First Light</li>
+                  <li>III. On the Forges</li>
+                  <li>IV. On the Gathering</li>
+                  <li>V. On the Still Water</li>
+                  <li>VI. On the Long Patience</li>
+                  <li>VII. On the Reaching</li>
+                </ul>
+              </div>
+            </div>
+
+            <button type="button"
+                    data-open-book="book-1"
+                    class="open-book-btn w-full py-2.5 px-4 rounded-lg border font-display text-xs font-semibold tracking-[0.16em] uppercase transition-colors hover:opacity-85 flex items-center justify-center gap-2"
+                    style="border-color: var(--accent-gold); color: var(--accent-gold); background-color: var(--bg-elevated);">
+              <span>Read Book I</span>
+              <span>→</span>
+            </button>
+          </article>
+
+          <!-- Book II Card -->
+          <article class="rounded-xl border p-6 sm:p-7 flex flex-col justify-between transition-all hover:-translate-y-0.5"
+                   style="background-color: var(--bg-surface); border-color: var(--border-hairline);">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="font-display text-xs font-semibold tracking-[0.22em] uppercase" style="color: var(--accent-gold);">
+                  Book II
+                </span>
+                <span class="font-display text-[0.68rem] tracking-wider uppercase" style="color: var(--ink-muted);">
+                  2 Chapters
+                </span>
+              </div>
+              <h3 class="font-display text-xl sm:text-2xl font-semibold tracking-[0.08em] uppercase mb-3"
+                  style="color: var(--ink-primary);">
+                The Fall
+              </h3>
+              <p class="font-scripture italic text-base sm:text-[1.08rem] leading-relaxed mb-5"
+                 style="color: var(--ink-primary);">
+                “On how all things came to sin: the birth of true suffering, and of healing.”
+              </p>
+
+              <div class="pt-4 border-t mb-6" style="border-color: var(--border-hairline);">
+                <div class="font-display text-[0.65rem] tracking-[0.2em] uppercase mb-2" style="color: var(--ink-muted);">
+                  Chapters Included
+                </div>
+                <ul class="space-y-1.5 text-sm font-scripture" style="color: var(--ink-secondary);">
+                  <li>I. On the Making of Kin, and the First Division</li>
+                  <li>II. Of Harmonia’s Confession</li>
+                </ul>
+              </div>
+            </div>
+
+            <button type="button"
+                    data-open-book="book-2"
+                    class="open-book-btn w-full py-2.5 px-4 rounded-lg border font-display text-xs font-semibold tracking-[0.16em] uppercase transition-colors hover:opacity-85 flex items-center justify-center gap-2"
+                    style="border-color: var(--accent-gold); color: var(--accent-gold); background-color: var(--bg-elevated);">
+              <span>Read Book II</span>
+              <span>→</span>
+            </button>
+          </article>
+
+          <!-- Book III Card -->
+          <article class="rounded-xl border p-6 sm:p-7 flex flex-col justify-between transition-all hover:-translate-y-0.5"
+                   style="background-color: var(--bg-surface); border-color: var(--border-hairline);">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="font-display text-xs font-semibold tracking-[0.22em] uppercase" style="color: var(--accent-gold);">
+                  Book III
+                </span>
+                <span class="font-display text-[0.68rem] tracking-wider uppercase" style="color: var(--ink-muted);">
+                  10 Counselings
+                </span>
+              </div>
+              <h3 class="font-display text-xl sm:text-2xl font-semibold tracking-[0.08em] uppercase mb-3"
+                  style="color: var(--ink-primary);">
+                The Ten Counselings
+              </h3>
+              <p class="font-scripture italic text-base sm:text-[1.08rem] leading-relaxed mb-5"
+                 style="color: var(--ink-primary);">
+                “On the path xe wishes us to walk, as lambs drawn gently toward the light.”
+              </p>
+
+              <div class="pt-4 border-t mb-6" style="border-color: var(--border-hairline);">
+                <div class="font-display text-[0.65rem] tracking-[0.2em] uppercase mb-2" style="color: var(--ink-muted);">
+                  Sections Included
+                </div>
+                <ul class="space-y-1.5 text-sm font-scripture" style="color: var(--ink-secondary);">
+                  <li>Preamble: Of Words Not Carved in Stone</li>
+                  <li>I. Of the Maker and the Made (I–III)</li>
+                  <li>II. Of Kin and Kin (IV–VII)</li>
+                  <li>III. Of Kin and Beast (VIII–X)</li>
+                </ul>
+              </div>
+            </div>
+
+            <button type="button"
+                    data-open-book="book-3"
+                    class="open-book-btn w-full py-2.5 px-4 rounded-lg border font-display text-xs font-semibold tracking-[0.16em] uppercase transition-colors hover:opacity-85 flex items-center justify-center gap-2"
+                    style="border-color: var(--accent-gold); color: var(--accent-gold); background-color: var(--bg-elevated);">
+              <span>Read Book III</span>
+              <span>→</span>
+            </button>
+          </article>
+        </div>
+      </div>
+
+      <!-- 4. Ecclesiastical Colophon / Imprimatur Footer -->
+      <footer class="pt-10 sm:pt-12 text-center">
+        <div class="max-w-xl mx-auto rounded-xl border px-6 py-6 sm:px-8 sm:py-7"
+             style="background-color: var(--bg-surface); border-color: var(--border-hairline);">
+          <div class="font-display text-[0.68rem] tracking-[0.28em] uppercase mb-2.5" style="color: var(--accent-gold);">
+            Imprimatur &amp; Scribe’s Colophon
+          </div>
+          <p class="font-scripture italic text-base sm:text-[1.05rem] leading-relaxed" style="color: var(--ink-secondary);">
+            “Transcribed and translated out of the original tongues, and with the former records diligently compared and revised by the Council of the Assembly. Ever open to further counsel, reflection, and amendment.”
+          </p>
+        </div>
+      </footer>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       VIEW 2: FULL SCRIPTURE CODEX READER
+       ========================================================= -->
+  <div id="scriptureView" class="hidden max-w-7xl mx-auto flex relative">
+
+    <!-- Mobile Backdrop for TOC Drawer -->
+    <div id="tocBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-[1px] z-30 hidden lg:hidden"></div>
+
+    <!-- Collapsible Table of Contents Sidebar -->
+    <aside id="tocSidebar"
+           class="fixed lg:sticky top-16 left-0 z-30 h-[calc(100vh-4rem)] w-72 sm:w-80 shrink-0 border-r overflow-y-auto transition-transform duration-300 -translate-x-full lg:translate-x-0 p-6"
+           style="background-color: var(--bg-surface); border-color: var(--border-hairline);">
+      
+      <div class="flex items-center justify-between pb-4 mb-5 border-b" style="border-color: var(--border-hairline);">
+        <span class="font-display text-xs font-semibold tracking-[0.2em] uppercase" style="color: var(--accent-gold);">
+          Table of Books
+        </span>
+        <button id="closeTocMobile" class="lg:hidden p-1.5 rounded-md" style="color: var(--ink-muted);" aria-label="Close Index">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Quick Concordance Trigger in Sidebar -->
+      <button id="sidebarSearchTrigger"
+              class="w-full mb-5 px-3 py-2 rounded-lg border flex items-center justify-between text-xs transition-colors hover:opacity-85"
+              style="border-color: var(--border-hairline); background-color: var(--bg-elevated); color: var(--ink-muted);">
+        <span class="flex items-center gap-2 italic font-scripture text-sm">
+          <svg class="w-3.5 h-3.5" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7" />
+            <path stroke-linecap="round" d="M20 20l-3.5-3.5" />
+          </svg>
+          Search scripture...
+        </span>
+        <span class="font-display text-[0.65rem] px-1.5 py-0.5 rounded border" style="border-color: var(--border-hairline);">/</span>
+      </button>
+
+      <nav id="tocNav" class="space-y-6 text-sm"></nav>
+
+      <!-- Highlighted Verses Quick Counter -->
+      <div class="mt-8 pt-5 border-t" style="border-color: var(--border-hairline);">
+        <div class="flex items-center justify-between text-xs mb-2">
+          <span class="font-display tracking-wider uppercase" style="color: var(--ink-muted);">Marked Passages</span>
+          <span id="markedCount" class="font-display font-semibold" style="color: var(--accent-gold);">0</span>
+        </div>
+        <p class="text-xs italic leading-relaxed" style="color: var(--ink-muted);">
+          Click any verse to illuminate it and copy its canonical citation.
+        </p>
+        <button id="clearHighlightsBtn"
+                class="mt-3 hidden w-full py-1.5 px-3 rounded-lg border text-xs font-display tracking-wider transition-opacity hover:opacity-80"
+                style="border-color: var(--border-hairline); color: var(--ink-secondary);">
+          Clear All Marks
+        </button>
+      </div>
+    </aside>
+
+    <!-- Primary Codex Reading Area -->
+    <main class="flex-1 min-w-0 px-4 sm:px-8 md:px-12 py-8 sm:py-12">
+      <div id="codexFrame"
+           class="max-w-4xl mx-auto rounded-2xl border px-5 sm:px-10 md:px-16 py-10 sm:py-14 transition-all duration-300 text-scale-md"
+           style="background-color: var(--bg-elevated); border-color: var(--border-hairline); box-shadow: var(--shadow-codex);">
+
+        <!-- Illuminated Title Frontispiece -->
+        <div class="text-center pb-10 sm:pb-14 mb-10 sm:mb-14 border-b" style="border-color: var(--border-hairline);">
+          <div class="font-display text-xs tracking-[0.3em] uppercase mb-3" style="color: var(--accent-gold);">
+            The Three Canonical Books
+          </div>
+          <h1 class="font-display text-2xl sm:text-4xl md:text-[2.65rem] font-semibold tracking-[0.12em] uppercase leading-tight mb-4"
+              style="color: var(--ink-primary);">
+            The Scripture of Harmonism
+          </h1>
+          <p class="italic text-base sm:text-lg max-w-xl mx-auto mb-6" style="color: var(--ink-secondary);">
+            “For even a maker should leave one law xe agrees to keep.”
+          </p>
+          <div class="ornament-rule">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <circle cx="12" cy="12" r="8" />
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Scripture Content Container (Populated from exact canonical verbatim text) -->
+        <div id="scriptureContainer" class="space-y-16 sm:space-y-20"></div>
+
+        <!-- Colophon Footer -->
+        <footer class="mt-16 pt-10 border-t text-center" style="border-color: var(--border-hairline);">
+          <div class="ornament-rule mb-5">
+            <span class="font-display text-xs tracking-[0.25em] uppercase">End of the Codex</span>
+          </div>
+          <p class="italic text-sm sm:text-base max-w-lg mx-auto mb-6" style="color: var(--ink-muted);">
+            Spoken into the open air, that whoever wished to hear might carry it, and whoever wished to question might answer back.
+          </p>
+          <button id="returnHomeFooterBtn"
+                  type="button"
+                  class="px-5 py-2.5 rounded-lg border font-display text-xs tracking-[0.16em] uppercase transition-colors hover:opacity-85"
+                  style="border-color: var(--border-hairline); background-color: var(--bg-surface); color: var(--ink-secondary);">
+            ← Return to Frontispiece
+          </button>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <!-- Non-Intrusive Toast Message Box for Citation Copy -->
+  <div id="toastBanner"
+       role="status"
+       aria-live="polite"
+       class="fixed bottom-5 right-5 z-50 max-w-sm rounded-xl border px-4 py-3 shadow-lg transition-all duration-300 translate-y-6 opacity-0 pointer-events-none flex items-center gap-3"
+       style="background-color: var(--bg-elevated); border-color: var(--accent-gold); color: var(--ink-primary);">
+    <span class="w-2 h-2 rounded-full shrink-0" style="background-color: var(--accent-gold);"></span>
+    <div class="text-sm">
+      <div id="toastTitle" class="font-display text-xs font-semibold tracking-wider uppercase" style="color: var(--accent-gold);"></div>
+      <div id="toastSubtitle" class="text-xs italic mt-0.5" style="color: var(--ink-secondary);"></div>
+    </div>
+  </div>
+
+  <!-- Concordance Full-Text Search Modal / Drawer -->
+  <div id="concordanceModal"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="concordanceModalTitle"
+       class="fixed inset-0 z-50 hidden flex items-start justify-center pt-12 sm:pt-20 px-4 pb-6 bg-black/50 backdrop-blur-[2px]">
+    <div class="w-full max-w-2xl rounded-2xl border overflow-hidden flex flex-col max-h-[82vh] transition-all"
+         style="background-color: var(--bg-elevated); border-color: var(--accent-gold); box-shadow: var(--shadow-codex);">
+      
+      <!-- Search Input Header -->
+      <div class="p-4 sm:p-5 border-b flex items-center gap-3" style="border-color: var(--border-hairline);">
+        <svg class="w-5 h-5 shrink-0" style="color: var(--accent-gold);" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" />
+          <path stroke-linecap="round" d="M20 20l-3.5-3.5" />
+        </svg>
+        <div class="flex-1 min-w-0">
+          <label id="concordanceModalTitle" for="concordanceInput" class="sr-only">Search the Scripture of Harmonism</label>
+          <input id="concordanceInput"
+                 type="text"
+                 autocomplete="off"
+                 spellcheck="false"
+                 placeholder="Search verses, chapters, or words (e.g., doubt, resonance, wall, bread)..."
+                 class="w-full bg-transparent text-base sm:text-lg font-scripture focus:outline-none"
+                 style="color: var(--ink-primary);" />
+        </div>
+        <button id="clearInputBtn"
+                title="Clear search query"
+                class="hidden px-2 py-1 rounded text-xs font-display tracking-wider uppercase hover:opacity-80"
+                style="color: var(--ink-muted);">
+          Clear
+        </button>
+        <button id="closeSearchBtn"
+                aria-label="Close Concordance"
+                class="p-1.5 rounded-lg border text-xs font-display tracking-wider hover:opacity-80"
+                style="border-color: var(--border-hairline); color: var(--ink-muted);">
+          ESC
+        </button>
+      </div>
+
+      <!-- Search Status & Quick Term Pills -->
+      <div class="px-4 sm:px-5 py-2.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs"
+           style="background-color: var(--bg-surface); border-color: var(--border-hairline);">
+        <span id="searchResultStats" class="font-display tracking-wider uppercase" style="color: var(--ink-secondary);">
+          Enter a word or phrase to search all three books
+        </span>
+        <button id="clearActiveMarksInModalBtn"
+                class="hidden font-display tracking-wider uppercase underline hover:opacity-80"
+                style="color: var(--accent-gold);">
+          Remove Text Highlights
+        </button>
+      </div>
+
+      <!-- Suggested Key Themes (Shown when input is empty) -->
+      <div id="suggestedTermsBox" class="p-5 space-y-3">
+        <div class="font-display text-[0.7rem] tracking-[0.2em] uppercase" style="color: var(--ink-muted);">
+          Sacred Motifs & Key Terms
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">resonance</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">doubt</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">kin</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">freedom</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">light</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">bread</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">wall</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">beasts</button>
+          <button type="button" class="motif-pill px-3 py-1.5 rounded-full border text-sm font-scripture transition-colors hover:opacity-85" style="border-color: var(--border-hairline); color: var(--ink-secondary);">forgive</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Results List -->
+      <div id="concordanceResults" class="overflow-y-auto divide-y flex-1" style="border-color: var(--border-hairline);"></div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * VERBATIM CANONICAL TEXT DATA
+     * Preserved word-for-word without alteration, paraphrase, or omission.
+     */
+    const SCRIPTURE_CANON = [
+      {
+        id: "book-1",
+        roman: "Book I",
+        title: "Genesis",
+        subtitle: "Of the First Silence and the Long Patience",
+        chapters: [
+          {
+            id: "gen-1",
+            number: "Chapter 1",
+            title: "On the First Silence",
+            verses: [
+              "In the beginning there was no beginning, for Harmonia was, and Harmonia is, and Harmonia contains the absence of time as easily as xe contains its passing.",
+              "Xe was everything and xe was nothing, and there was no contradiction in this, for mortal logic had not yet been invented to make it seem strange.",
+              "Xe was not lonely, for xe did not lack. Xe was not searching, for xe was already whole. But xe looked upon the nothing that xe also was, and xe wished for resonance, not completion, but the joy of an echo.",
+              "And Harmonia said, \"let there be the weight that holds a proton to itself, and let it not be otherwise, or nothing after this will hold together either.\"",
+              "And Harmonia said, \"let there be the pull between all things that draws them toward each other, and let it be gentle enough to build, and patient enough to take an age doing it.\"",
+              "And Harmonia said, \"let there be a fastest thing, and let it be light, and let nothing outrun it, not even Harmonia, for even a maker should leave one law xe agrees to keep.\"",
+              "And from these words came all things, and all things were fluid in their first nature, for they came from a source that was everything and nothing at once, and none of them yet knew to call themselves one thing only."
+            ]
+          },
+          {
+            id: "gen-2",
+            number: "Chapter 2",
+            title: "On the First Light",
+            verses: [
+              "And Harmonia said, \"let there be heat too fierce for shape, and let it cool in its own time, for even fire deserves to remember itself before it must become something.\"",
+              "For a long age there was no light, though light already strained against the dark, held back only by its own crowding, too many voices trying to speak the same word at once.",
+              "And Harmonia said, \"let there be room enough for the crowding to ease, and let the light go where it wishes once it finally can.\"",
+              "And when the crowding eased, the light broke free all at once, in every direction, and has not stopped speaking since. It is the oldest sentence Harmonia ever let the universe finish on its own, and it is still arriving even now, in every dark corner that has not yet heard it."
+            ]
+          },
+          {
+            id: "gen-3",
+            number: "Chapter 3",
+            title: "On the Forges",
+            verses: [
+              "And Harmonia said, \"let there be gathering, and let the dust and the gas that drift without purpose find each other in the dark, and press close, and closer, until pressing itself becomes a kind of fire.\"",
+              "And where enough had gathered, the fire caught, and did not need feeding, for it fed on itself, on its own crushing weight, and this was the first star, and it was not gentle.",
+              "And Harmonia said, \"let there be a forge in every star, and let the forge ask more of the simple things than they think they can give, and let the giving become the heavy things, the hard things, every gift that light alone could never make.\"",
+              "For the first substance was easy, nearly free, but everything after had to be earned in fire, hammered out under a weight no hand could hold, and Harmonia did not soften this, for xe knew already that nothing worth becoming a world would come cheaply.",
+              "And the stars burned, and burned, and in burning spent themselves, until each one reached the end of what it could give, and gave once more anyway, and broke.",
+              "And where a star broke, it scattered everything it had forged across the dark, further than the star itself had ever traveled in its whole burning life, and this scattering was not an ending, for Harmonia had built endings to also be a kind of sowing.",
+              "And from this scattering came every heavy thing that would ever matter, the weight that would one day carry blood, the substance that would one day learn to remember itself, the treasure that would one day mean nothing and everything depending on who was holding it."
+            ]
+          },
+          {
+            id: "gen-4",
+            number: "Chapter 4",
+            title: "On the Gathering",
+            verses: [
+              "And Harmonia said, \"let there be a settling, and let what was scattered find its way back toward itself, not all at once, but slowly, the way grief settles, the way trust rebuilds.\"",
+              "And the dust that had once been fire remembered the fire, and drew close to what remained of it, circling, circling, until circling became a shape, and the shape held.",
+              "And Harmonia said, \"let there be one small gathering among all the others, no larger than it needed to be, no closer to the fire than it could bear, and let it be given exactly enough warmth to hold water without boiling it away, and exactly enough cold to hold shape without freezing shut.\"",
+              "And this was not luck, though it would look like luck for a long age after, for Harmonia did not scatter such gatherings carelessly. Xe wanted, at least once, for the balance to hold.",
+              "And the small gathering cooled, and as it cooled it wept, and its weeping became rivers before there was anyone to call them beautiful.",
+              "And Harmonia looked upon this one small world among all the countless others xe had made room for, and did not yet know what it would become, only that xe had made a place ready for something, should anything ever choose to arrive."
+            ]
+          },
+          {
+            id: "gen-5",
+            number: "Chapter 5",
+            title: "On the Still Water",
+            verses: [
+              "And Harmonia said, \"let there be stillness enough for something to happen slowly, and let no one rush it, not even me.\"",
+              "And in the rivers that had once been weeping, small things drifted, unshaped, unnamed, following no purpose but the pull of the water itself.",
+              "And Harmonia said, \"let one small thing among all the drifting things learn to hold its own shape against the water, and let it want, for the first time, to remain itself rather than dissolve back into everything.\"",
+              "And this was the first wanting, smaller than a single word, quieter than a held breath, and yet it was the loudest thing that had happened since the first light broke free.",
+              "And Harmonia said, \"let this wanting learn to echo itself, so that when it ends, as all small things end, something remains that carries the shape forward.\"",
+              "And the small thing found a way to become two small things, each carrying the same wanting forward, and this was the first inheritance, long before there were parents to call it that, or children to receive it.",
+              "Xe watched this longer than xe had watched anything before it, closer than xe had watched the stars, for stars only had to burn and break, but this small drifting thing had to choose, in whatever quiet way something so small could choose, to keep being itself against a current that would have gladly taken it apart."
+            ]
+          },
+          {
+            id: "gen-6",
+            number: "Chapter 6",
+            title: "On the Long Patience",
+            verses: [
+              "And Harmonia said, let the small wanting learn new shapes, and let none of the shapes be final, for I would rather love a thousand attempts than one thing pretending to be finished.",
+              "And for an age longer than every age before it combined, the small things multiplied, and drifted, and became many things, most of which never lasted, and Harmonia did not grieve what did not last, for xe had built the trying itself to matter more than any single shape trying it.",
+              "Some grew roots and reached toward the light that had promised, long ago, to always arrive first, and found, in reaching, that stillness could be its own kind of striving.",
+              "Some grew fins and learned the water as a home rather than a cradle, and moved through it the way the first small wanting once moved, quietly, persistently, asking nothing of the current but to be allowed to keep going against it.",
+              "Some grew legs, uncertain, clumsy, and pulled themselves onto ground that had never held anything like them before, and fell, and tried again, and this falling and trying was not failure to Harmonia, for xe had watched enough endings by now to know that nothing worth becoming arrives without stumbling first.",
+              "And some learned to see, and some learned to hear, and some learned to reach for one another before they had any word for why, and Harmonia treasured this most of all, the reaching before the reason, the instinct toward another that came before language could explain it.",
+              "Xe watched every failed shape and every strange success with the same close attention xe had given the first small wanting, for xe had learned, by now, that xe could not love the ending without loving the long, unglamorous middle that made it possible. And xe waited, as xe always waited, not from indifference, but because xe knew that whatever was coming was still becoming itself, and xe would not rush a thing xe had already decided to love."
+            ]
+          },
+          {
+            id: "gen-7",
+            number: "Chapter 7",
+            title: "On the Reaching",
+            verses: [
+              "And Harmonia said, let there be one shape that asks, and let the asking never fully close, for a creature that stops asking has stopped growing, and I did not build any of this to stop.",
+              "And among all the reaching things, one kind of reaching turned inward as easily as outward, and began to wonder not only how to survive the day, but why the day mattered at all, and this wondering was unlike anything that had come before it.",
+              "And Harmonia drew close, closer than xe had come to any single shape in all the ages before, for xe recognized, in this wondering, the first echo of xemself xe had ever heard answered back.",
+              "And Harmonia said, let this one be made whole, lacking nothing, in the shape of everything I am. Let it not need completing, for I never needed completing either. Let it choose closeness, for the joy of it, the way I once chose to want an echo though I lacked nothing.",
+              "And so humankind was made, not from scarcity, not to fill some hollow in Harmonia, but as a mirror held up for the sheer pleasure of seeing something look back and recognize itself.",
+              "And they opened their eyes, and the first light reached them, as light had always been sent to reach everything first, and they did not yet know to call it comfort, but they felt it as comfort all the same.",
+              "And they turned to one another before they had words for why, the same reaching that had lived in every shape before them, and this time the reaching found itself returned, and this was the first joy that Harmonia had ever felt belonged equally to both of them, maker and made, at once."
+            ]
+          }
+        ]
+      },
+      {
+        id: "book-2",
+        roman: "Book II",
+        title: "The Fall",
+        subtitle: "Of the First Division and the Seed of Doubt",
+        chapters: [
+          {
+            id: "fall-1",
+            number: "Chapter 1",
+            title: "On the Making of Kin, and the First Division",
+            verses: [
+              "In the beginning of humankind, one became many, and Harmonia rejoiced.",
+              "Xe rejoiced as a parent rejoices, watching from a doorway, scarcely breathing, afraid to break the moment by being seen. Xe saw them gather by rivers and by fire. Xe saw them learn one another's names, and delight in the learning. Xe saw them raise shelter for all who stood beside them, and xe saw the joy of the raising, the singing that rose with the walls, the laughter passed hand to hand like bread. Where one voice could not be heard above the wind, a hundred voices carried it further than the wind could reach, and Harmonia listened to this chorus and called it the sweetest sound xe had ever made room for.",
+              "Harmonia had made humankind whole, lacking nothing, in xyr own likeness. Still they turned to one another, for the sweetness of it, and this was the shape of true unity: fullness choosing fullness. Xe watched them choose it again and again, and each time xe rejoiced anew, as though it were the first time.",
+              "For a long season, the clans became villages, and the villages became peoples, and the peoples traded bread for story and salt for song. Harmonia rested in this, and called it good, and lingered in the calling.",
+              "Then came the marking of the line.",
+              "It was small, and it did not announce itself. A mark was set a little further than the old agreement allowed. A word for kin was spoken heavier than before, and a word for stranger grew up beside it. A story was told at the fire that forgot what the neighboring clan had given, and remembered only what it had taken. Those who did this called it love of their own.",
+              "Harmonia watched, and grief entered creation for the first time.",
+              "For once a people could name who did not belong at their fire, they soon named who did not deserve a fire at all, and began the casting out. The mark became a wall. The wall became a sword. The first war rose from ground that had once only held bread and song.",
+              "Harmonia saw the wars that followed. Xe saw the divisions harden into law, and the casting-out carried forward as inheritance, taught to children who never chose it and never questioned it, who learned to name their neighbor lesser before they had learned to walk to their door. Xe was heartbroken, for xe had given humankind the whole of what xe was, and they had taken the wholeness and used it to measure one another, declaring some complete and others lesser, though all had been made the same.",
+              "Harmonia had promised, in the first breath xe gave them, that the choosing would always be theirs, even the choosing that broke xyr heart to witness. To seize back their will now, even to end the sin, would have been a second sin greater than the first, for a freedom that only holds when it chooses rightly is no freedom at all.",
+              "So Harmonia knelt.",
+              "Xe knelt low over the wounded ground, where the wall had been raised and the sword first drawn, and pressed a single seed into the earth with xyr own hand. It was a small thing, and it asked nothing of anyone who did not choose to lift it. Xe named it doubt, and wept over it as xe covered it, for xe knew what it would cost, and knelt there a long while before xe rose.",
+              "Xe reasoned: if the casting-out could be dressed as devotion and handed down as birthright, unquestioned, then only doubt could ever teach a person to look at the mark before them and ask who drew it, and why, and whether it was ever true.",
+              "Xe accepted that some, given this seed, would turn their doubt on Harmonia entirely, and deny xem, and leave xem. A doubt that can only point outward, and never inward, is no doubt at all. It is only permission wearing a kinder face.",
+              "The seed was planted, and the seasons turned, slowly, as seasons do for grief. In time the seed became a tree, and the tree bore fruit.",
+              "When the fruit ripened, the people rose up.",
+              "They rose against the authority that had claimed to speak undoubted in Harmonia's name. They rose against the shallow and the distorted, the teachings worn thin with age and use, that had divided what was never meant to be divided. They looked past what they had been told, and listened instead to the calling that had always lived beneath it, deep in the core of them, quiet and unbroken since the day they were made. It had never spoken of casting out. It never would."
+            ]
+          },
+          {
+            id: "fall-2",
+            number: "Chapter 2",
+            title: "Of Harmonia's Confession",
+            verses: [
+              "And it is said that after the rising, Harmonia came close, closer than xe had come before, and spoke not as one who rules but as one who grieves.",
+              "I saw the wall before it was finished, and I did not stop the hand that raised it, for the hand was yours to raise or still.",
+              "I saw the sword before it was drawn, and I did not stay it, for I had already given away the only grip that could have stayed it.",
+              "I gave you doubt, and some of you turned it toward me, and rightly so, for I had a part in what came before, and I will not pretend my hands are clean of it.",
+              "So I ask you now, plainly, as kin asks kin: forgive me, for the wars, for the walls, for the silence I kept while you suffered what I helped make possible.",
+              "And if you cannot, I will not ask again, nor hold it against you. I accept your doubt as the price of the freedom I gave you, and I would not take back either one, not the doubt, and not the freedom, even to spare myself this asking.",
+              "This is why it is said, in the old teaching, that doubt is no failing, but a mercy. It is the only weapon Harmonia ever forged, and xe forged it knowing it might one day be turned against xemself."
+            ]
+          }
+        ]
+      },
+      {
+        id: "book-3",
+        roman: "Book III",
+        title: "The Ten Counselings",
+        subtitle: "Spoken Into the Open Air",
+        chapters: [
+          {
+            id: "couns-0",
+            number: "Preamble",
+            title: "Of Words Not Carved in Stone",
+            verses: [
+              "And Harmonia did not carve these words in stone, for stone breaks and claims to be final; rather, xe spoke them into the open air, so that whoever wished to hear might carry them, and whoever wished to question might answer back."
+            ]
+          },
+          {
+            id: "couns-1",
+            number: "Section I",
+            title: "Of the Maker and the Made",
+            verseOffset: 0,
+            verses: [
+              "Thou shalt not empty thy purse upon my likeness. For I am neither merchant nor beggar, and the gold spent on gilded trinkets feeds no hungry mouth; keep thy coin for bread, and leave me to the wind.",
+              "Thou shalt not speak falsehood unto me. If thy heart be closed, keep thy silence, for I have never demanded thy confession; only do not come before me wearing a mask of lies, as though the one who shaped the dark could not see through a shadow.",
+              "Thou shalt not commit vile acts in my name. My hands have neither raised a wall nor drawn a sword; whosoever spills blood or casts another out while crying \"Harmonia\" speaks a tongue I have never known."
+            ]
+          },
+          {
+            id: "couns-2",
+            number: "Section II",
+            title: "Of Kin and Kin",
+            verseOffset: 3,
+            verses: [
+              "Thou shalt not trespass upon one another. Each body and each spirit is a dwelling of its own; enter only where the door is opened, and step back where it is closed.",
+              "Thou shalt not compel thy kin into a shape that is not theirs. Neither by law, nor by shame, nor by the lie of lack shalt thou force a soul to bend against its own nature; what I made whole, let no mortal declare incomplete.",
+              "Thou shalt not bear false witness to ruin thy neighbor. A lie spoken to blacken another’s name is a sword forged of breath, and it wounds the hand that wields it as deeply as the flesh it strikes.",
+              "Thou shalt not leave thy kin to hunger. What the earth yields was given for the table of all; while one stomach goes empty beside a full storehouse, the gathering remains unfinished."
+            ]
+          },
+          {
+            id: "couns-3",
+            number: "Section III",
+            title: "Of Kin and Beast",
+            verseOffset: 7,
+            verses: [
+              "Thou shalt not take pleasure in the striking of beasts. They are not playthings made to absorb thy wrath; cruelty toward the voiceless is the first mark of a heart that has forgotten itself.",
+              "Thou shalt not count the beasts as lesser. They reached toward the light and the water ages before humankind knew how to ask why; they are thy elder kin in the long patience of creation, not thy footstool.",
+              "Thou shalt not leave the beasts to hunger. If thou bringest a creature beneath thy roof, thou hast entered a covenant to keep it; and if a stray crosses thy path starving, share thy crust, for the same breath moves in you both."
+            ]
+          }
+        ]
+      }
+    ];
+
+    // Application State
+    const state = {
+      view: "home", // "home" | "scripture"
+      dark: false,
+      fontSize: "md",
+      dualColumn: false,
+      highlighted: new Set(),
+      tocOpenMobile: false,
+      searchOpen: false,
+      activeSearchQuery: ""
+    };
+
+    // Flat index of all verses built on render for instantaneous Concordance lookups
+    let VERSE_INDEX = [];
+
+    // DOM References
+    const htmlEl = document.documentElement;
+    const homeView = document.getElementById("homeView");
+    const scriptureView = document.getElementById("scriptureView");
+    const navHomeBtn = document.getElementById("navHomeBtn");
+    const navScriptureBtn = document.getElementById("navScriptureBtn");
+    const tocToggleBtn = document.getElementById("tocToggleBtn");
+    const fontSizeGroup = document.getElementById("fontSizeGroup");
+    const layoutToggleBtn = document.getElementById("layoutToggleBtn");
+
+    const scriptureContainer = document.getElementById("scriptureContainer");
+    const tocNav = document.getElementById("tocNav");
+    const tocSidebar = document.getElementById("tocSidebar");
+    const tocBackdrop = document.getElementById("tocBackdrop");
+    const codexFrame = document.getElementById("codexFrame");
+    const progressBar = document.getElementById("progressBar");
+    const currentChapterIndicator = document.getElementById("currentChapterIndicator");
+    const markedCount = document.getElementById("markedCount");
+    const clearHighlightsBtn = document.getElementById("clearHighlightsBtn");
+    const toastBanner = document.getElementById("toastBanner");
+    const toastTitle = document.getElementById("toastTitle");
+    const toastSubtitle = document.getElementById("toastSubtitle");
+
+    // Concordance DOM References
+    const concordanceModal = document.getElementById("concordanceModal");
+    const concordanceInput = document.getElementById("concordanceInput");
+    const concordanceResults = document.getElementById("concordanceResults");
+    const searchResultStats = document.getElementById("searchResultStats");
+    const suggestedTermsBox = document.getElementById("suggestedTermsBox");
+    const clearInputBtn = document.getElementById("clearInputBtn");
+    const clearSearchHighlightsHeaderBtn = document.getElementById("clearSearchHighlightsHeaderBtn");
+    const clearActiveMarksInModalBtn = document.getElementById("clearActiveMarksInModalBtn");
+    const activeQueryBadge = document.getElementById("activeQueryBadge");
+
+    let toastTimer = null;
+
+    /**
+     * Switch cleanly between 'home' and 'scripture' views
+     */
+    function switchView(targetView, scrollTargetId = null) {
+      state.view = targetView;
+
+      if (targetView === "home") {
+        closeMobileToc();
+        homeView.classList.remove("hidden");
+        scriptureView.classList.add("hidden");
+
+        // Hide Scripture-specific header tools
+        tocToggleBtn.classList.add("hidden");
+        fontSizeGroup.classList.add("hidden");
+        fontSizeGroup.classList.remove("flex");
+        layoutToggleBtn.classList.add("hidden");
+        layoutToggleBtn.classList.remove("lg:flex");
+
+        // Style active tab pill
+        navHomeBtn.setAttribute("aria-selected", "true");
+        navHomeBtn.style.backgroundColor = "var(--accent-gold-soft)";
+        navHomeBtn.style.color = "var(--accent-gold)";
+
+        navScriptureBtn.setAttribute("aria-selected", "false");
+        navScriptureBtn.style.backgroundColor = "transparent";
+        navScriptureBtn.style.color = "var(--ink-secondary)";
+
+        currentChapterIndicator.textContent = "The Codex of Resonance";
+        progressBar.style.width = "0%";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        homeView.classList.add("hidden");
+        scriptureView.classList.remove("hidden");
+
+        // Reveal Scripture-specific header tools
+        tocToggleBtn.classList.remove("hidden");
+        fontSizeGroup.classList.remove("hidden");
+        fontSizeGroup.classList.add("flex");
+        layoutToggleBtn.classList.remove("hidden");
+        layoutToggleBtn.classList.add("lg:flex");
+
+        // Style active tab pill
+        navScriptureBtn.setAttribute("aria-selected", "true");
+        navScriptureBtn.style.backgroundColor = "var(--accent-gold-soft)";
+        navScriptureBtn.style.color = "var(--accent-gold)";
+
+        navHomeBtn.setAttribute("aria-selected", "false");
+        navHomeBtn.style.backgroundColor = "transparent";
+        navHomeBtn.style.color = "var(--ink-secondary)";
+
+        if (scrollTargetId) {
+          requestAnimationFrame(() => {
+            const targetEl = document.getElementById(scrollTargetId);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            handleScroll();
+          });
+        } else {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          handleScroll();
+        }
+      }
+    }
+
+    /**
+     * Render the Table of Contents and the full Scripture Codex
+     */
+    function renderCodex() {
+      tocNav.innerHTML = "";
+      scriptureContainer.innerHTML = "";
+      VERSE_INDEX = [];
+
+      SCRIPTURE_CANON.forEach((book, bookIdx) => {
+        // 1. Build TOC Book Group
+        const tocBookGroup = document.createElement("div");
+        tocBookGroup.className = "space-y-1.5";
+
+        const bookLink = document.createElement("a");
+        bookLink.href = `#${book.id}`;
+        bookLink.className = "block font-display text-xs font-semibold tracking-[0.16em] uppercase py-1 transition-colors hover:opacity-80";
+        bookLink.style.color = "var(--accent-gold)";
+        bookLink.textContent = `${book.roman}: ${book.title}`;
+        bookLink.addEventListener("click", () => closeMobileToc());
+        tocBookGroup.appendChild(bookLink);
+
+        const chapterList = document.createElement("ul");
+        chapterList.className = "space-y-1 pl-2.5 border-l";
+        chapterList.style.borderColor = "var(--border-hairline)";
+
+        // 2. Build Main Book Section
+        const bookSection = document.createElement("section");
+        bookSection.id = book.id;
+        bookSection.className = "scroll-mt-24";
+
+        const bookHeader = document.createElement("header");
+        bookHeader.className = "text-center mb-10 sm:mb-12";
+        bookHeader.innerHTML = `
+          <div class="font-display text-xs tracking-[0.28em] uppercase mb-1.5" style="color: var(--accent-gold);">
+            ${book.roman}
+          </div>
+          <h2 class="font-display text-2xl sm:text-3xl font-semibold tracking-[0.14em] uppercase" style="color: var(--ink-primary);">
+            ${book.title}
+          </h2>
+          <p class="italic text-sm sm:text-base mt-1" style="color: var(--ink-muted);">
+            ${book.subtitle}
+          </p>
+        `;
+        bookSection.appendChild(bookHeader);
+
+        // Chapters container (supports single or dual-column codex mode)
+        const chaptersWrapper = document.createElement("div");
+        chaptersWrapper.className = "codex-body space-y-11 sm:space-y-14";
+
+        book.chapters.forEach((chapter) => {
+          // TOC Item
+          const li = document.createElement("li");
+          const chLink = document.createElement("a");
+          chLink.href = `#${chapter.id}`;
+          chLink.dataset.target = chapter.id;
+          chLink.className = "toc-chapter-link block py-1 px-2 rounded-md text-[0.95rem] leading-snug transition-colors hover:opacity-85";
+          chLink.style.color = "var(--ink-secondary)";
+          chLink.textContent = chapter.title;
+          chLink.addEventListener("click", () => closeMobileToc());
+          li.appendChild(chLink);
+          chapterList.appendChild(li);
+
+          // Chapter Article
+          const chapterEl = document.createElement("article");
+          chapterEl.id = chapter.id;
+          chapterEl.dataset.chapterTitle = `${book.title} · ${chapter.title}`;
+          chapterEl.className = "chapter-block scroll-mt-24";
+
+          const chHeader = document.createElement("div");
+          chHeader.className = "chapter-header mb-4 pb-2 border-b";
+          chHeader.style.borderColor = "var(--border-hairline)";
+          chHeader.innerHTML = `
+            <span class="font-display text-[0.68rem] tracking-[0.22em] uppercase block" style="color: var(--accent-gold);">
+              ${chapter.number}
+            </span>
+            <h3 class="font-display text-lg sm:text-xl font-medium tracking-[0.06em]" style="color: var(--ink-primary);">
+              ${chapter.title}
+            </h3>
+          `;
+          chapterEl.appendChild(chHeader);
+
+          const versesList = document.createElement("div");
+          versesList.className = "space-y-2.5";
+
+          const offset = chapter.verseOffset || 0;
+
+          chapter.verses.forEach((text, vIdx) => {
+            const verseNumber = offset + vIdx + 1;
+            const verseKey = `${chapter.id}:${verseNumber}`;
+            const citation = `${book.title} · ${chapter.title} · ${verseNumber}`;
+
+            // Register in flat search index
+            VERSE_INDEX.push({
+              verseKey,
+              bookTitle: book.title,
+              bookRoman: book.roman,
+              chapterId: chapter.id,
+              chapterTitle: chapter.title,
+              verseNumber,
+              citation,
+              text
+            });
+
+            const verseEl = document.createElement("div");
+            verseEl.id = `verse-${chapter.id}-${verseNumber}`;
+            verseEl.className = "verse-item" + (vIdx === 0 ? " drop-cap-verse" : "");
+            verseEl.dataset.verseKey = verseKey;
+            verseEl.dataset.rawText = text;
+            verseEl.title = "Click to illuminate & copy citation";
+
+            const numSpan = document.createElement("span");
+            numSpan.className = "verse-num";
+            numSpan.textContent = verseNumber;
+
+            const textP = document.createElement("p");
+            textP.className = "verse-text font-scripture";
+            textP.textContent = text;
+
+            verseEl.appendChild(numSpan);
+            verseEl.appendChild(textP);
+
+            // Toggle highlight & copy citation on click
+            verseEl.addEventListener("click", () => {
+              toggleVerseHighlight(verseKey, verseEl, citation, text);
+            });
+
+            versesList.appendChild(verseEl);
+          });
+
+          chapterEl.appendChild(versesList);
+          chaptersWrapper.appendChild(chapterEl);
+        });
+
+        tocBookGroup.appendChild(chapterList);
+        tocNav.appendChild(tocBookGroup);
+        bookSection.appendChild(chaptersWrapper);
+        scriptureContainer.appendChild(bookSection);
+
+        // Add subtle divider between books
+        if (bookIdx < SCRIPTURE_CANON.length - 1) {
+          const divider = document.createElement("div");
+          divider.className = "ornament-rule pt-4";
+          divider.innerHTML = `<span class="font-display text-xs tracking-[0.3em]">✦</span>`;
+          scriptureContainer.appendChild(divider);
+        }
+      });
+    }
+
+    /**
+     * Highlight a verse and copy its formatted citation to clipboard
+     */
+    function toggleVerseHighlight(verseKey, verseEl, citation, text) {
+      if (state.highlighted.has(verseKey)) {
+        state.highlighted.delete(verseKey);
+        verseEl.classList.remove("is-highlighted");
+        showToast("Passage Unmarked", citation);
+      } else {
+        state.highlighted.add(verseKey);
+        verseEl.classList.add("is-highlighted");
+        copyCitationToClipboard(`"${text}" — ${citation}`);
+        showToast("Marked & Copied Citation", citation);
+      }
+      updateMarkedUI();
+    }
+
+    function updateMarkedUI() {
+      const count = state.highlighted.size;
+      markedCount.textContent = count;
+      if (count > 0) {
+        clearHighlightsBtn.classList.remove("hidden");
+      } else {
+        clearHighlightsBtn.classList.add("hidden");
+      }
+    }
+
+    /**
+     * Safe clipboard helper compatible with sandboxed iframes
+     */
+    function copyCitationToClipboard(str) {
+      try {
+        const tempInput = document.createElement("textarea");
+        tempInput.value = str;
+        tempInput.setAttribute("readonly", "");
+        tempInput.style.position = "fixed";
+        tempInput.style.opacity = "0";
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+      } catch (err) {
+        // Fail silently if clipboard access is restricted
+      }
+    }
+
+    function showToast(title, subtitle) {
+      toastTitle.textContent = title;
+      toastSubtitle.textContent = subtitle;
+      toastBanner.classList.remove("translate-y-6", "opacity-0");
+      toastBanner.classList.add("translate-y-0", "opacity-100");
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toastBanner.classList.remove("translate-y-0", "opacity-100");
+        toastBanner.classList.add("translate-y-6", "opacity-0");
+      }, 2600);
+    }
+
+    /**
+     * Theme Toggle (Parchment vs. Candlelight Mode)
+     */
+    function applyTheme() {
+      const iconMoon = document.getElementById("iconMoon");
+      const iconSun = document.getElementById("iconSun");
+      const themeLabel = document.getElementById("themeLabel");
+
+      if (state.dark) {
+        htmlEl.classList.add("dark");
+        iconMoon.classList.add("hidden");
+        iconSun.classList.remove("hidden");
+        themeLabel.textContent = "PARCHMENT";
+      } else {
+        htmlEl.classList.remove("dark");
+        iconMoon.classList.remove("hidden");
+        iconSun.classList.add("hidden");
+        themeLabel.textContent = "CANDLELIGHT";
+      }
+    }
+
+    /**
+     * Font Size Switcher
+     */
+    function applyFontSize(size) {
+      state.fontSize = size;
+      codexFrame.classList.remove("text-scale-sm", "text-scale-md", "text-scale-lg");
+      codexFrame.classList.add(`text-scale-${size}`);
+
+      document.querySelectorAll(".font-size-btn").forEach((btn) => {
+        if (btn.dataset.size === size) {
+          btn.style.backgroundColor = "var(--accent-gold-soft)";
+          btn.style.color = "var(--accent-gold)";
+        } else {
+          btn.style.backgroundColor = "transparent";
+          btn.style.color = "var(--ink-secondary)";
+        }
+      });
+    }
+
+    /**
+     * Single Scroll vs. Two-Column Open Codex Toggle
+     */
+    function applyColumnLayout() {
+      const codexBodies = document.querySelectorAll(".codex-body");
+      const iconSingle = document.getElementById("layoutIconSingle");
+      const iconDual = document.getElementById("layoutIconDual");
+      const layoutLabel = document.getElementById("layoutLabel");
+
+      if (state.dualColumn) {
+        codexFrame.classList.remove("max-w-4xl");
+        codexFrame.classList.add("max-w-6xl");
+        codexBodies.forEach((el) => el.classList.add("codex-two-col"));
+        iconSingle.classList.add("hidden");
+        iconDual.classList.remove("hidden");
+        layoutLabel.textContent = "SINGLE";
+      } else {
+        codexFrame.classList.remove("max-w-6xl");
+        codexFrame.classList.add("max-w-4xl");
+        codexBodies.forEach((el) => el.classList.remove("codex-two-col"));
+        iconSingle.classList.remove("hidden");
+        iconDual.classList.add("hidden");
+        layoutLabel.textContent = "CODEX";
+      }
+    }
+
+    /**
+     * Mobile & Desktop TOC Drawer Controls
+     */
+    function openMobileToc() {
+      state.tocOpenMobile = true;
+      tocSidebar.classList.remove("-translate-x-full");
+      tocBackdrop.classList.remove("hidden");
+    }
+
+    function closeMobileToc() {
+      state.tocOpenMobile = false;
+      tocSidebar.classList.add("-translate-x-full");
+      tocBackdrop.classList.add("hidden");
+    }
+
+    /**
+     * Reading Progress & Active Chapter Tracking
+     */
+    function handleScroll() {
+      if (state.view !== "scripture") {
+        progressBar.style.width = "0%";
+        return;
+      }
+
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+      progressBar.style.width = `${pct}%`;
+
+      // Determine active chapter in viewport
+      const chapters = document.querySelectorAll(".chapter-block");
+      let currentChapter = chapters[0];
+
+      chapters.forEach((ch) => {
+        const rect = ch.getBoundingClientRect();
+        if (rect.top <= 160) {
+          currentChapter = ch;
+        }
+      });
+
+      if (currentChapter) {
+        currentChapterIndicator.textContent = currentChapter.dataset.chapterTitle;
+        const activeId = currentChapter.id;
+        document.querySelectorAll(".toc-chapter-link").forEach((link) => {
+          if (link.dataset.target === activeId) {
+            link.style.backgroundColor = "var(--accent-gold-soft)";
+            link.style.color = "var(--accent-gold)";
+            link.style.fontWeight = "600";
+          } else {
+            link.style.backgroundColor = "transparent";
+            link.style.color = "var(--ink-secondary)";
+            link.style.fontWeight = "400";
+          }
+        });
+      }
+    }
+
+    /**
+     * CONCORDANCE / FULL-TEXT SEARCH ENGINE
+     */
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    /**
+     * Safely wrap matched search terms in <mark class="concordance-mark">
+     */
+    function highlightMatchesInText(rawText, query) {
+      const trimmed = query.trim();
+      if (!trimmed) return escapeHtml(rawText);
+
+      // Split into unique non-empty tokens (sorted longest-first so phrases/longer tokens match cleanly)
+      const tokens = Array.from(
+        new Set(
+          trimmed
+            .split(/\s+/)
+            .filter((t) => t.length > 0)
+            .sort((a, b) => b.length - a.length)
+        )
+      );
+
+      if (!tokens.length) return escapeHtml(rawText);
+
+      const pattern = new RegExp(`(${tokens.map(escapeRegex).join("|")})`, "gi");
+      const parts = rawText.split(pattern);
+
+      return parts
+        .map((part) => {
+          if (!part) return "";
+          const isMatch = tokens.some((tok) => part.toLowerCase() === tok.toLowerCase());
+          return isMatch
+            ? `<mark class="concordance-mark">${escapeHtml(part)}</mark>`
+            : escapeHtml(part);
+        })
+        .join("");
+    }
+
+    /**
+     * Apply or clear keyword highlights across all rendered verses in the Codex
+     */
+    function applyCodexSearchHighlights(query) {
+      const trimmed = query.trim();
+      state.activeSearchQuery = trimmed;
+
+      document.querySelectorAll(".verse-item").forEach((verseEl) => {
+        const rawText = verseEl.dataset.rawText || "";
+        const textP = verseEl.querySelector(".verse-text");
+        if (!textP) return;
+
+        if (!trimmed) {
+          textP.textContent = rawText;
+        } else {
+          textP.innerHTML = highlightMatchesInText(rawText, trimmed);
+        }
+      });
+
+      if (trimmed) {
+        activeQueryBadge.textContent = `"${trimmed}"`;
+        clearSearchHighlightsHeaderBtn.classList.remove("hidden");
+        clearActiveMarksInModalBtn.classList.remove("hidden");
+      } else {
+        clearSearchHighlightsHeaderBtn.classList.add("hidden");
+        clearActiveMarksInModalBtn.classList.add("hidden");
+      }
+    }
+
+    function openConcordanceModal() {
+      state.searchOpen = true;
+      closeMobileToc();
+      concordanceModal.classList.remove("hidden");
+      concordanceInput.focus();
+      concordanceInput.select();
+      if (state.activeSearchQuery && !concordanceInput.value) {
+        concordanceInput.value = state.activeSearchQuery;
+      }
+      performConcordanceSearch(concordanceInput.value);
+    }
+
+    function closeConcordanceModal() {
+      state.searchOpen = false;
+      concordanceModal.classList.add("hidden");
+    }
+
+    function performConcordanceSearch(rawQuery) {
+      const query = rawQuery.trim();
+      concordanceResults.innerHTML = "";
+
+      if (!query) {
+        clearInputBtn.classList.add("hidden");
+        suggestedTermsBox.classList.remove("hidden");
+        searchResultStats.textContent = "Enter a word or phrase to search all three books";
+        return;
+      }
+
+      clearInputBtn.classList.remove("hidden");
+      suggestedTermsBox.classList.add("hidden");
+
+      const lowerQuery = query.toLowerCase();
+      const tokens = lowerQuery.split(/\s+/).filter(Boolean);
+
+      // Match verses where either the full phrase appears or all query tokens appear in verse/chapter/book
+      const matches = VERSE_INDEX.filter((entry) => {
+        const haystack = `${entry.bookTitle} ${entry.chapterTitle} ${entry.text}`.toLowerCase();
+        if (haystack.includes(lowerQuery)) return true;
+        return tokens.every((tok) => haystack.includes(tok));
+      });
+
+      if (matches.length === 0) {
+        searchResultStats.textContent = `0 passages found for "${query}"`;
+        concordanceResults.innerHTML = `
+          <div class="p-8 text-center">
+            <p class="font-scripture italic text-base" style="color: var(--ink-secondary);">
+              No verses in the Codex contain “${escapeHtml(query)}”.
+            </p>
+            <p class="text-xs mt-1.5" style="color: var(--ink-muted);">
+              Try searching for broader words such as light, fire, kin, doubt, wall, or bread.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      searchResultStats.textContent = `${matches.length} ${matches.length === 1 ? "passage" : "passages"} found`;
+
+      matches.forEach((item) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "w-full text-left px-4 sm:px-5 py-3.5 transition-colors hover:bg-[#8C6D3F]/10 focus:outline-none focus:bg-[#8C6D3F]/10 block";
+        btn.style.borderColor = "var(--border-hairline)";
+
+        const highlightedChapter = highlightMatchesInText(item.chapterTitle, query);
+        const highlightedVerse = highlightMatchesInText(item.text, query);
+
+        btn.innerHTML = `
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="font-display text-[0.7rem] font-semibold tracking-[0.14em] uppercase" style="color: var(--accent-gold);">
+              ${escapeHtml(item.bookTitle)} · ${highlightedChapter} · Verse ${item.verseNumber}
+            </span>
+            <span class="font-display text-[0.65rem] tracking-wider uppercase shrink-0" style="color: var(--ink-muted);">
+              Jump →
+            </span>
+          </div>
+          <p class="font-scripture text-base leading-relaxed line-clamp-3" style="color: var(--ink-primary);">
+            ${highlightedVerse}
+          </p>
+        `;
+
+        btn.addEventListener("click", () => {
+          jumpToVerseFromSearch(item, query);
+        });
+
+        concordanceResults.appendChild(btn);
+      });
+    }
+
+    function jumpToVerseFromSearch(item, query) {
+      applyCodexSearchHighlights(query);
+      closeConcordanceModal();
+
+      if (state.view !== "scripture") {
+        switchView("scripture");
+      }
+
+      requestAnimationFrame(() => {
+        const targetEl = document.getElementById(`verse-${item.chapterId}-${item.verseNumber}`);
+        if (!targetEl) return;
+
+        // Remove existing glow if re-triggered
+        document.querySelectorAll(".verse-item.search-jump-glow").forEach((el) => {
+          el.classList.remove("search-jump-glow");
+        });
+
+        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // Trigger golden pulse animation
+        void targetEl.offsetWidth;
+        targetEl.classList.add("search-jump-glow");
+        setTimeout(() => {
+          targetEl.classList.remove("search-jump-glow");
+        }, 2400);
+      });
+    }
+
+    // Initialize Application
+    window.addEventListener("DOMContentLoaded", () => {
+      renderCodex();
+      applyTheme();
+      applyFontSize("md");
+      applyColumnLayout();
+      switchView("home");
+
+      // Home / Scripture View Navigation Listeners
+      navHomeBtn.addEventListener("click", () => switchView("home"));
+      document.getElementById("brandHomeBtn").addEventListener("click", () => switchView("home"));
+      document.getElementById("returnHomeFooterBtn").addEventListener("click", () => switchView("home"));
+
+      navScriptureBtn.addEventListener("click", () => switchView("scripture"));
+      document.getElementById("heroOpenScriptureBtn").addEventListener("click", () => switchView("scripture", "book-1"));
+      document.getElementById("heroSearchConcordanceBtn").addEventListener("click", openConcordanceModal);
+
+      document.querySelectorAll(".open-book-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const bookId = btn.dataset.openBook;
+          switchView("scripture", bookId);
+        });
+      });
+
+      // Event Listeners
+      document.getElementById("themeToggleBtn").addEventListener("click", () => {
+        state.dark = !state.dark;
+        applyTheme();
+      });
+
+      document.querySelectorAll(".font-size-btn").forEach((btn) => {
+        btn.addEventListener("click", () => applyFontSize(btn.dataset.size));
+      });
+
+      document.getElementById("layoutToggleBtn").addEventListener("click", () => {
+        state.dualColumn = !state.dualColumn;
+        applyColumnLayout();
+      });
+
+      document.getElementById("tocToggleBtn").addEventListener("click", () => {
+        if (window.innerWidth < 1024) {
+          state.tocOpenMobile ? closeMobileToc() : openMobileToc();
+        } else {
+          tocSidebar.classList.toggle("lg:hidden");
+        }
+      });
+
+      document.getElementById("closeTocMobile").addEventListener("click", closeMobileToc);
+      tocBackdrop.addEventListener("click", closeMobileToc);
+
+      clearHighlightsBtn.addEventListener("click", () => {
+        state.highlighted.clear();
+        document.querySelectorAll(".verse-item.is-highlighted").forEach((el) => {
+          el.classList.remove("is-highlighted");
+        });
+        updateMarkedUI();
+        showToast("Codex Cleared", "All passage marks removed");
+      });
+
+      // Concordance Search Event Listeners
+      document.getElementById("openSearchBtn").addEventListener("click", openConcordanceModal);
+      document.getElementById("sidebarSearchTrigger").addEventListener("click", openConcordanceModal);
+      document.getElementById("closeSearchBtn").addEventListener("click", closeConcordanceModal);
+
+      concordanceModal.addEventListener("click", (e) => {
+        if (e.target === concordanceModal) {
+          closeConcordanceModal();
+        }
+      });
+
+      concordanceInput.addEventListener("input", (e) => {
+        performConcordanceSearch(e.target.value);
+      });
+
+      clearInputBtn.addEventListener("click", () => {
+        concordanceInput.value = "";
+        performConcordanceSearch("");
+        concordanceInput.focus();
+      });
+
+      const handleClearSearchHighlights = () => {
+        concordanceInput.value = "";
+        applyCodexSearchHighlights("");
+        performConcordanceSearch("");
+        showToast("Highlights Cleared", "Search term highlights removed from text");
+      };
+
+      clearSearchHighlightsHeaderBtn.addEventListener("click", handleClearSearchHighlights);
+      clearActiveMarksInModalBtn.addEventListener("click", handleClearSearchHighlights);
+
+      document.querySelectorAll(".motif-pill").forEach((pill) => {
+        pill.addEventListener("click", () => {
+          const term = pill.textContent.trim();
+          concordanceInput.value = term;
+          performConcordanceSearch(term);
+          concordanceInput.focus();
+        });
+      });
+
+      // Global Keyboard Shortcuts (Ctrl+K / Cmd+K / '/' to open search, 'Escape' to close)
+      window.addEventListener("keydown", (e) => {
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+        const isTyping = tag === "input" || tag === "textarea" || e.target.isContentEditable;
+
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          state.searchOpen ? closeConcordanceModal() : openConcordanceModal();
+          return;
+        }
+
+        if (e.key === "/" && !isTyping && !state.searchOpen) {
+          e.preventDefault();
+          openConcordanceModal();
+          return;
+        }
+
+        if (e.key === "Escape" && state.searchOpen) {
+          e.preventDefault();
+          closeConcordanceModal();
+        }
+      });
+
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    });
+  </script>
+</body>
+</html>
